@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "boost.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/IhorShevchuk/Boost.swift.git",
+      "state" : {
+        "revision" : "8d94cd03fdd1731236da58b35ee54d329d8d42f5",
+        "version" : "1.80.0"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "c8ed701b513cf5177118a175d85fbbbcd707ab41",
+        "version" : "1.3.0"
+      }
+    }
+  ],
+  "version" : 2
+}

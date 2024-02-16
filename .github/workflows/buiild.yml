@@ -1,0 +1,19 @@
+name: Build
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: sersoft-gmbh/swifty-linux-action@v3
+        with:
+          release-version: 5.9.2
+      - run: |
+          rm -fr .build | echo "Removed build folder"
+          swift build -c release --target RHVoiceCore
