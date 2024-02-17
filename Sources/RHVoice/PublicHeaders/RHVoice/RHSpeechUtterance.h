@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) RHSpeechSynthesisVoice *voice;
 @property (nonatomic, assign) double rate;
 @property (nonatomic, assign) double volume;
+@property (nonatomic, assign) double pitch;
 @property (nonatomic, assign) RHSpeechUtteranceQuality quality;
 
 - (instancetype)initWithText:(NSString * _Nullable)text;

@@ -37,6 +37,7 @@
         _ssml = ssml;
         self.rate = 1.0;
         self.volume = 1.0;
+        self.pitch = 1.0;
         self.quality = RHSpeechUtteranceQualityStandart;
         self.voice = [[RHSpeechSynthesisVoice speechVoices] firstObject];
     }
@@ -79,6 +80,7 @@
                                      voiceProfile);
     doc->speech_settings.relative.rate = self.rate;
     doc->speech_settings.relative.volume = self.volume;
+    doc->speech_settings.relative.pitch = self.pitch;
     doc->quality.set_from_string(self.rhVoiceQuality);
 
     return doc;
