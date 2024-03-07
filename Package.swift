@@ -5,6 +5,39 @@
 import PackageDescription
 import Foundation
 
+func boostHeaders() -> [CSetting] {
+    let packageURL = URL(fileURLWithPath: #file).deletingLastPathComponent()
+    let RHVoicePath = packageURL
+        .appendingPathComponent("RHVoice")
+    let boostRoot = RHVoicePath
+        .appendingPathComponent("external")
+        .appendingPathComponent("libs")
+        .appendingPathComponent("boost")
+        .appendingPathComponent("libs")
+
+    let fileManager = FileManager()
+    guard let folderEnumerator = fileManager.enumerator(at: boostRoot, includingPropertiesForKeys: nil) else {
+        return []
+    }
+
+    folderEnumerator.skipDescendants()
+
+    var result: [CSetting] = []
+    for folder in folderEnumerator {
+        guard let folderPath = folder as? URL else {
+            continue
+        }
+
+        let includePath = folderPath.appendingPathComponent("include").path
+        if fileManager.fileExists(atPath: includePath) {
+            let path = includePath.replacingOccurrences(of: RHVoicePath.path + "/" , with: "")
+            result.append(.headerSearchPath(path))
+        }
+    }
+
+    return result
+}
+
 let package = Package(
     name: "RHVoice",
     platforms: [
@@ -20,89 +53,52 @@ let package = Package(
         ])
     ],
     dependencies: [
-        /// This is a forked repo of https://github.com/GigaBitcoin/Boost.swift
-        .package(url: "https://github.com/IhorShevchuk/Boost.swift.git", .upToNextMajor(from: "1.80.0")),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
     ],
     targets: [
         .target(
             name: "RHVoiceCore",
             dependencies: [
-                .product(name: "algorithm", package: "Boost.swift"),
-                .product(name: "array", package: "Boost.swift"),
-                .product(name: "assert", package: "Boost.swift"),
-                .product(name: "bind", package: "Boost.swift"),
-                .product(name: "concept_check", package: "Boost.swift"),
-                .product(name: "config", package: "Boost.swift"),
-                .product(name: "container", package: "Boost.swift"),
-                .product(name: "container_hash", package: "Boost.swift"),
-                .product(name: "core", package: "Boost.swift"),
-                .product(name: "date_time", package: "Boost.swift"),
-                .product(name: "detail", package: "Boost.swift"),
-                .product(name: "foreach", package: "Boost.swift"),
-                .product(name: "function", package: "Boost.swift"),
-                .product(name: "integer", package: "Boost.swift"),
-                .product(name: "io", package: "Boost.swift"),
-                .product(name: "iterator", package: "Boost.swift"),
-                .product(name: "lexical_cast", package: "Boost.swift"),
-                .product(name: "move", package: "Boost.swift"),
-                .product(name: "mpl", package: "Boost.swift"),
-                .product(name: "multi_index", package: "Boost.swift"),
-                .product(name: "numeric_conversion", package: "Boost.swift"),
-                .product(name: "optional", package: "Boost.swift"),
-                .product(name: "preprocessor", package: "Boost.swift"),
-                .product(name: "range", package: "Boost.swift"),
-                .product(name: "serialization", package: "Boost.swift"),
-                .product(name: "signals2", package: "Boost.swift"),
-                .product(name: "smart_ptr", package: "Boost.swift"),
-                .product(name: "static_assert", package: "Boost.swift"),
-                .product(name: "throw_exception", package: "Boost.swift"),
-                .product(name: "tokenizer", package: "Boost.swift"),
-                .product(name: "tuple", package: "Boost.swift"),
-                .product(name: "type_index", package: "Boost.swift"),
-                .product(name: "type_traits", package: "Boost.swift"),
-                .product(name: "utility", package: "Boost.swift"),
-                .product(name: "variant", package: "Boost.swift")
             ],
-            path: "RHVoice/src/",
+            path: "RHVoice/",
             exclude: [
                 // Files that are not compiled because they are included into sources directly
-                "core/unidata.cpp",
-                "core/userdict_parser.c",
-                "core/emoji_data.cpp",
+                "src/core/unidata.cpp",
+                "src/core/userdict_parser.c",
+                "src/core/emoji_data.cpp",
                 // Platform audio files that shouldn't be compiled for iOS and macOS(at least in scope of this package)
-                "audio/libao.cpp",
-                "audio/portaudio.cpp",
-                "audio/pulse.cpp",
+                "src/audio/libao.cpp",
+                "src/audio/portaudio.cpp",
+                "src/audio/pulse.cpp",
                 // cmake files
-                "core/CMakeLists.txt",
-                "hts_engine/CMakeLists.txt",
-                "audio/CMakeLists.txt",
-                "lib/CMakeLists.txt",
+                "src/core/CMakeLists.txt",
+                "src/hts_engine/CMakeLists.txt",
+                "src/audio/CMakeLists.txt",
+                "src/lib/CMakeLists.txt",
                 // Scons files
-                "audio/SConscript",
-                "core/SConscript",
-                "hts_engine/SConscript",
-                "lib/SConscript",
-                "pkg/SConscript",
+                "src/audio/SConscript",
+                "src/core/SConscript",
+                "src/hts_engine/SConscript",
+                "src/lib/SConscript",
+                "src/pkg/SConscript",
                 // Not used on Apple platfroms since config path is set during runtime
-                "core/config.h.in",
+                "src/core/config.h.in",
                 // Not used on Apple platforms
-                "core/userdict_parser.g"
+                "src/core/userdict_parser.g"
             ],
             sources: [
-                "core",
-                "hts_engine",
-                "lib",
-                "audio"
+                "src/core",
+                "src/hts_engine",
+                "src/lib",
+                "src/audio"
             ],
-            publicHeadersPath: "include/",
+            publicHeadersPath: "src/include/",
             cSettings: [
-                .headerSearchPath("include/**"),
-                .headerSearchPath("hts_engine"),
-                .headerSearchPath("third-party/utf8"),
-                .headerSearchPath("third-party/rapidxml"),
-                .headerSearchPath("../../Sources/Mock"),
+                .headerSearchPath("src/include/**"),
+                .headerSearchPath("src/hts_engine"),
+                .headerSearchPath("src/third-party/utf8"),
+                .headerSearchPath("src/third-party/rapidxml"),
+                .headerSearchPath("../Sources/Mock"),
                 .define("RHVOICE"),
                 .define("PACKAGE", to: "\"RHVoice\""),
                 .define("DATA_PATH", to: "\"\""),
@@ -110,7 +106,7 @@ let package = Package(
                 .define("ANDROID"),
                 .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
                 .define("TARGET_OS_MAC", .when(platforms: [.macOS]))
-            ]
+            ] + boostHeaders()
         ),
         .target(name: "RHVoice",
                 dependencies: [
