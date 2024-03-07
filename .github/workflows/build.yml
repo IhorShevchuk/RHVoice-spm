@@ -5,15 +5,21 @@ on:
       - 'main'
 
 jobs:
-  Build:
+  linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        image: 
+          - "swift:5.9.0"
+    name: Linux
     runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
     steps:
       - uses: actions/checkout@v2
         with:
+          clean: true
           submodules: recursive
-      - uses: sersoft-gmbh/swifty-linux-action@v3
-        with:
-          release-version: 5.9.2
       - run: |
           rm -fr .build | echo "Removed build folder"
           swift build -c release --target RHVoiceCore
