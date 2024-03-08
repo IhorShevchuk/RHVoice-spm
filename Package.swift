@@ -30,7 +30,7 @@ func boostHeaders() -> [CSetting] {
 
         let includePath = folderPath.appendingPathComponent("include").path
         if fileManager.fileExists(atPath: includePath) {
-            let path = includePath.replacingOccurrences(of: RHVoicePath.path + "/" , with: "")
+            let path = includePath.replacingOccurrences(of: RHVoicePath.path + "/", with: "")
             result.append(.headerSearchPath(path))
         }
     }
@@ -41,8 +41,10 @@ func boostHeaders() -> [CSetting] {
 let package = Package(
     name: "RHVoice",
     platforms: [
-        .macOS(.v11),
-        .iOS(.v13)
+        .macOS(.v10_13),
+        .iOS(.v12),
+        .tvOS(.v12),
+        .watchOS(.v4)
     ],
     products: [
         .library(
