@@ -1,0 +1,8 @@
+module RHVoice {
+    umbrella "../RHVoice/src/include/"
+
+    explicit module * {
+        export *
+    }
+    requires cplusplus
+}

@@ -22,4 +22,4 @@ jobs:
           submodules: recursive
       - run: |
           rm -fr .build | echo "Removed build folder"
-          swift build -c release --target RHVoiceCore
+          swift build -c release --target RHVoiceSwift

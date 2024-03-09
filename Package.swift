@@ -1,13 +1,14 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.9
 
 //  Copyright (C) 2022  Olga Yakovleva <olga@rhvoice.org>
 
 import PackageDescription
 import Foundation
 
-func boostHeaders() -> [CSetting] {
+func boostHeadersPaths() -> [String] {
     let packageURL = URL(fileURLWithPath: #file).deletingLastPathComponent()
     let RHVoicePath = packageURL
+        .appendingPathComponent("RHVoice")
         .appendingPathComponent("RHVoice")
     let boostRoot = RHVoicePath
         .appendingPathComponent("external")
@@ -22,7 +23,7 @@ func boostHeaders() -> [CSetting] {
 
     folderEnumerator.skipDescendants()
 
-    var result: [CSetting] = []
+    var result: [String] = []
     for folder in folderEnumerator {
         guard let folderPath = folder as? URL else {
             continue
@@ -31,11 +32,29 @@ func boostHeaders() -> [CSetting] {
         let includePath = folderPath.appendingPathComponent("include").path
         if fileManager.fileExists(atPath: includePath) {
             let path = includePath.replacingOccurrences(of: RHVoicePath.path + "/", with: "")
-            result.append(.headerSearchPath(path))
+            result.append(path)
         }
     }
 
     return result
+}
+
+func boostHeaders(prefix: String = "") -> [CSetting] {
+    return boostHeadersPaths().map { path in
+        return .headerSearchPath(prefix + path)
+    }
+}
+
+func commonHeaderSearchPath(prefix: String = "") -> [CSetting] {
+    let headerPaths = [
+        "RHVoice/src/third-party/utf8",
+        "RHVoice/src/third-party/rapidxml",
+        "RHVoice/src/include"
+    ]
+
+    return headerPaths.map { path in
+        return .headerSearchPath(prefix + path)
+    }
 }
 
 let package = Package(
@@ -48,58 +67,56 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "RHVoice",
-            targets: ["RHVoice"]),
+            name: "RHVoiceObjC",
+            targets: ["RHVoiceObjC"]),
         .plugin(name: "PackDataPlugin", targets: [
             "PackDataPlugin"
-        ])
+        ]),
+        .library(name: "RHVoiceSwift",
+                 targets: ["RHVoiceSwift"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
     ],
     targets: [
         .target(
-            name: "RHVoiceCore",
+            name: "RHVoice",
             dependencies: [
             ],
-            path: "RHVoice/",
+            path: "RHVoice",
             exclude: [
                 // Files that are not compiled because they are included into sources directly
-                "src/core/unidata.cpp",
-                "src/core/userdict_parser.c",
-                "src/core/emoji_data.cpp",
+                "RHVoice/src/core/unidata.cpp",
+                "RHVoice/src/core/userdict_parser.c",
+                "RHVoice/src/core/emoji_data.cpp",
                 // Platform audio files that shouldn't be compiled for iOS and macOS(at least in scope of this package)
-                "src/audio/libao.cpp",
-                "src/audio/portaudio.cpp",
-                "src/audio/pulse.cpp",
+                "RHVoice/src/audio/libao.cpp",
+                "RHVoice/src/audio/portaudio.cpp",
+                "RHVoice/src/audio/pulse.cpp",
                 // cmake files
-                "src/core/CMakeLists.txt",
-                "src/hts_engine/CMakeLists.txt",
-                "src/audio/CMakeLists.txt",
-                "src/lib/CMakeLists.txt",
+                "RHVoice/src/core/CMakeLists.txt",
+                "RHVoice/src/hts_engine/CMakeLists.txt",
+                "RHVoice/src/audio/CMakeLists.txt",
+                "RHVoice/src/lib/CMakeLists.txt",
                 // Scons files
-                "src/audio/SConscript",
-                "src/core/SConscript",
-                "src/hts_engine/SConscript",
-                "src/lib/SConscript",
-                "src/pkg/SConscript",
+                "RHVoice/src/audio/SConscript",
+                "RHVoice/src/core/SConscript",
+                "RHVoice/src/hts_engine/SConscript",
+                "RHVoice/src/lib/SConscript",
+                "RHVoice/src/pkg/SConscript",
                 // Not used on Apple platfroms since config path is set during runtime
-                "src/core/config.h.in",
+                "RHVoice/src/core/config.h.in",
                 // Not used on Apple platforms
-                "src/core/userdict_parser.g"
+                "RHVoice/src/core/userdict_parser.g"
             ],
             sources: [
-                "src/core",
-                "src/hts_engine",
-                "src/lib",
-                "src/audio"
+                "RHVoice/src/core",
+                "RHVoice/src/hts_engine",
+                "RHVoice/src/lib",
+                "RHVoice/src/audio"
             ],
-            publicHeadersPath: "src/include/",
             cSettings: [
-                .headerSearchPath("src/include/**"),
-                .headerSearchPath("src/hts_engine"),
-                .headerSearchPath("src/third-party/utf8"),
-                .headerSearchPath("src/third-party/rapidxml"),
+                .headerSearchPath("RHVoice/src/hts_engine"),
                 .headerSearchPath("../Sources/Mock"),
                 .define("RHVOICE"),
                 .define("PACKAGE", to: "\"RHVoice\""),
@@ -108,33 +125,60 @@ let package = Package(
                 .define("ANDROID"),
                 .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
                 .define("TARGET_OS_MAC", .when(platforms: [.macOS]))
-            ] + boostHeaders()
+            ]
+            + boostHeaders(prefix: "RHVoice/")
+            + commonHeaderSearchPath()
         ),
-        .target(name: "RHVoice",
+        .target(name: "RHVoiceObjC",
                 dependencies: [
-                    .target(name: "RHVoiceCore")
+                    .target(name: "RHVoice")
                 ],
                 path: "Sources",
+                exclude: [
+                    "RHVoiceSwift"
+                    ],
                 sources: [
                     "CoreLib",
                     "RHVoice",
                     "Utils"
                 ],
-                publicHeadersPath: "RHVoice/PublicHeaders/",
+                publicHeadersPath: "RHVoiceObjC/PublicHeaders/",
                 cSettings: [
-                    .headerSearchPath("../RHVoice/src/third-party/utf8"),
-                    .headerSearchPath("../RHVoice/src/third-party/rapidxml"),
-                    .headerSearchPath("RHVoice/Logger"),
-                    .headerSearchPath("RHVoice/PrivateHeaders"),
+                    .headerSearchPath("RHVoiceObjC/Logger"),
+                    .headerSearchPath("RHVoiceObjC/PrivateHeaders"),
                     .headerSearchPath("Utils"),
                     .headerSearchPath("CoreLib"),
                     .headerSearchPath("Mock"),
                     .define("ANDROID"),
                     .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
                     .define("TARGET_OS_MAC", .when(platforms: [.macOS]))
-                ],
+                ]
+                + commonHeaderSearchPath(prefix: "../RHVoice/")
+                ,
                 linkerSettings: [
                     .linkedFramework("AVFAudio")
+                ]
+               ),
+        .target(name: "RHVoiceSwift",
+                dependencies: [
+                    .target(name: "RHVoice")
+                ],
+                path: "Sources",
+                sources: [
+                    "RHVoiceSwift"
+                ],
+                cSettings: ([
+                    .headerSearchPath("Mock"),
+                    .define("ANDROID"),
+                    .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
+                    .define("TARGET_OS_MAC", .when(platforms: [.macOS]))
+                ]
+                            + boostHeaders(prefix: "../RHVoice/RHVoice/")
+                            + commonHeaderSearchPath(prefix: "../RHVoice/")
+
+                ),
+                swiftSettings: [
+                    .interoperabilityMode(.Cxx)
                 ]
                ),
         /// Plugin to copy languages and voices data files

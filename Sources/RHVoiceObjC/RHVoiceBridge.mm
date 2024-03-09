@@ -26,7 +26,7 @@
 
 #include "RHEventLoggerImpl.hpp"
 #include "core/engine.hpp"
-#include "../../RHVoice/src/include/RHVoice.h"
+#include "../../RHVoice/RHVoice/src/include/RHVoice.h"
 
 @interface RHVoiceBridge () {
     std::shared_ptr<RHVoice::engine> RHEngine;

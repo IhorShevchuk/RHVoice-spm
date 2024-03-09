@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #import <RHVoice/RHVoiceLoggerProtocol.h>
-#import "RHVoice_common.h"
+#import "RHVoice.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
