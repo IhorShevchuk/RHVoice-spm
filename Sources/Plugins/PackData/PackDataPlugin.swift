@@ -61,7 +61,7 @@ struct PackDataPlugin: BuildToolPlugin {
         let jsonData = try Data(contentsOf: inputURL)
         let jsonInfo = try JSONDecoder().decode(JSONFormat.self, from: jsonData)
 
-        let inputDataFolder = packageRoot + "/RHVoice/data"
+        let inputDataFolder = packageRoot + "/RHVoice/RHVoice/data"
 
         return [
             .buildCommand(

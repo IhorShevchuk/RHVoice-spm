@@ -16,24 +16,23 @@ import AVFoundation
 public class RHSpeechSynthesizer {
     public struct Params {
         // TODO: have logger protocol(RHVoiceLoggerProtocol) and add variable of it's type here
-        public var dataPath: String?
-        public var configPath: String?
+        public var dataPath: String
+        public var configPath: String
         public static var `default`: Params = {
             var pathToData = Bundle.main.path(forResource: "RHVoiceData", ofType: nil)
             if pathToData == nil || pathToData?.isEmpty == true {
                 let rhVoiceBundle = Bundle(path: Bundle.main.path(forResource: "RHVoice_RHVoice", ofType: "bundle") ?? "")
                 pathToData = rhVoiceBundle?.path(forResource: "data", ofType: nil)
             }
-            return Params(dataPath: pathToData,
-                          // TODO: use FileManager.default.currentDirectoryPath here
-                          configPath: "")
+            return Params(dataPath: pathToData ?? "",
+                          configPath: FileManager.default.currentDirectoryPath + "/")
 
         }()
 
         var rhVoiceParam: RHVoice_init_params {
             var result = RHVoice_init_params()
-            result.data_path = dataPath?.toPointer()
-            result.config_path = configPath?.toPointer()
+            result.data_path = dataPath.toPointer()
+            result.config_path = configPath.toPointer()
             return result
         }
     }
