@@ -85,7 +85,7 @@ let package = Package(
                  targets: ["RHVoiceSwift"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0")
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.1")
     ],
     targets: [
         .target(
