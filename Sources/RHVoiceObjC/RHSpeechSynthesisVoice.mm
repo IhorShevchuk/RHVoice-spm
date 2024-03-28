@@ -22,7 +22,6 @@
 @property (nonatomic, strong) NSString *dataPath;
 @property (nonatomic, strong) RHLanguage *language;
 @property (nonatomic, strong) NSString *countryCode;
-@property (nonatomic, strong) NSString *voiceLanguageCode;
 @property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, assign) RHSpeechSynthesisVoiceGender gender;
 @end
@@ -30,28 +29,6 @@
 @implementation RHSpeechSynthesisVoice
 
 #pragma mark - Public
-
-- (NSString *)languageCode {
-    
-    NSString *languageCode = [[self language] code];
-    
-    const BOOL isLanguageCodeEmpty = languageCode == nil || [languageCode isEqualToString:@""];
-    const BOOL isCountryCodeEmpty = [self voiceLanguageCode] == nil || [[self voiceLanguageCode] isEqualToString:@""];
-    
-    if (isLanguageCodeEmpty && isCountryCodeEmpty) {
-        return @"";
-    }
-    
-    if(isLanguageCodeEmpty) {
-        return [self voiceLanguageCode];
-    }
-    
-    if(isCountryCodeEmpty) {
-        return languageCode;
-    }
-
-    return [NSString stringWithFormat:@"%@-%@", languageCode, [self voiceLanguageCode]];
-}
 
 - (RHVersionInfo * __nullable)version {
     return [[RHVersionInfo alloc] initWith:[[self dataPath] stringByAppendingPathComponent:@"voice.info"]];
@@ -118,7 +95,6 @@
         self.dataPath = STDStringToNSString(voice_information->get_data_path());
         self.name = STDStringToNSString(voice_information->get_name());
         self.language = [[RHLanguage alloc] initWith:*voice_information->get_language()];
-        self.voiceLanguageCode = STDStringToNSString(voice_information->get_alpha2_country_code());
         self.identifier = STDStringToNSString(voice_information->get_id());
         self.gender = [RHSpeechSynthesisVoice genderFromRHVoiceGender:voice_information->get_gender()];
     }

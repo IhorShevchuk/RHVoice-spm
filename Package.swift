@@ -57,13 +57,22 @@ func commonHeaderSearchPath(prefix: String = "") -> [CSetting] {
     }
 }
 
+func commonCSettings(prefix: String = "") -> [CSetting] {
+
+    return [                    .define("ANDROID"),
+                                .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
+                                .define("TARGET_OS_MAC", .when(platforms: [.macOS]))]
+    + boostHeaders(prefix: prefix + "RHVoice/")
+    + commonHeaderSearchPath(prefix: prefix)
+}
+
 let package = Package(
     name: "RHVoice",
     platforms: [
-        .macOS(.v10_13),
-        .iOS(.v12),
-        .tvOS(.v12),
-        .watchOS(.v4)
+        .macOS(.v10_15),
+        .iOS(.v13),
+        .tvOS(.v13),
+        .watchOS(.v5)
     ],
     products: [
         .library(
@@ -121,39 +130,24 @@ let package = Package(
                 .define("RHVOICE"),
                 .define("PACKAGE", to: "\"RHVoice\""),
                 .define("DATA_PATH", to: "\"\""),
-                .define("CONFIG_PATH", to: "\"\""),
-                .define("ANDROID"),
-                .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
-                .define("TARGET_OS_MAC", .when(platforms: [.macOS]))
+                .define("CONFIG_PATH", to: "\"\"")
             ]
-            + boostHeaders(prefix: "RHVoice/")
-            + commonHeaderSearchPath()
+            + commonCSettings()
         ),
         .target(name: "RHVoiceObjC",
                 dependencies: [
                     .target(name: "RHVoice")
                 ],
-                path: "Sources",
-                exclude: [
-                    "RHVoiceSwift"
-                    ],
-                sources: [
-                    "CoreLib",
-                    "RHVoice",
-                    "Utils"
-                ],
-                publicHeadersPath: "RHVoiceObjC/PublicHeaders/",
+                path: "Sources/RHVoiceObjC",
+                publicHeadersPath: "PublicHeaders/",
                 cSettings: [
-                    .headerSearchPath("RHVoiceObjC/Logger"),
-                    .headerSearchPath("RHVoiceObjC/PrivateHeaders"),
+                    .headerSearchPath("Logger"),
+                    .headerSearchPath("PrivateHeaders"),
                     .headerSearchPath("Utils"),
                     .headerSearchPath("CoreLib"),
-                    .headerSearchPath("Mock"),
-                    .define("ANDROID"),
-                    .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
-                    .define("TARGET_OS_MAC", .when(platforms: [.macOS]))
+                    .headerSearchPath("../Mock")
                 ]
-                + commonHeaderSearchPath(prefix: "../RHVoice/")
+                + commonCSettings(prefix: "../../RHVoice/")
                 ,
                 linkerSettings: [
                     .linkedFramework("AVFAudio")
@@ -161,26 +155,46 @@ let package = Package(
                ),
         .target(name: "RHVoiceSwift",
                 dependencies: [
-                    .target(name: "RHVoice")
+                    .target(name: "RHVoice"),
+                    .target(name: "PlayerLib")
                 ],
-                path: "Sources",
-                sources: [
-                    "RHVoiceSwift"
-                ],
+                path: "Sources/RHVoiceSwift",
                 cSettings: ([
-                    .headerSearchPath("Mock"),
-                    .define("ANDROID"),
-                    .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
-                    .define("TARGET_OS_MAC", .when(platforms: [.macOS]))
+                    .headerSearchPath("../Mock")
                 ]
-                            + boostHeaders(prefix: "../RHVoice/RHVoice/")
-                            + commonHeaderSearchPath(prefix: "../RHVoice/")
-
+                            + commonCSettings(prefix: "../../RHVoice/")
                 ),
                 swiftSettings: [
                     .interoperabilityMode(.Cxx)
                 ]
                ),
+        .target(name: "PlayerLib",
+                dependencies: [
+                    .target(name: "RHVoice")
+                ],
+                path: "Sources/PlayerLib",
+                cSettings: ([
+                    .headerSearchPath("../Mock")
+                ]
+                            + commonCSettings(prefix: "../../RHVoice/")
+                )
+               ),
+        .executableTarget(
+            name: "RHVoiceSwiftSample",
+            dependencies: [
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .target(name: "RHVoiceSwift")
+            ],
+            path: "Sources/RHVoiceSwiftSample",
+            cSettings: ([
+                .headerSearchPath("../Mock")
+            ]
+                        + commonCSettings(prefix: "../../RHVoice/")
+            ),
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ]
+        ),
         /// Plugin to copy languages and voices data files
         .executableTarget(
             name: "PackDataExecutable",
