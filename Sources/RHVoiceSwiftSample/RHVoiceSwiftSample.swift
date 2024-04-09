@@ -6,13 +6,12 @@
 //
 
 import Foundation
-import ArgumentParser
 import RHVoiceSwift
 
 @main
-struct PackDataExecutable: ParsableCommand {
+struct PackDataExecutable {
 
-    var dataPath: String {
+    static var dataPath: String {
         let fileUrl = URL(fileURLWithPath: #file)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -21,7 +20,7 @@ struct PackDataExecutable: ParsableCommand {
         return fileUrl.path + "/RHVoice/RHVoice/data"
     }
 
-    func run() throws {
+    static func main() throws {
         var params = RHVoiceSwift.RHSpeechSynthesizer.Params.default
 
         params.dataPath = dataPath

@@ -6,22 +6,62 @@
 //  Copyright (C) 2022  Olga Yakovleva <olga@rhvoice.org>
 
 import Foundation
-import ArgumentParser
 
 @main
-struct PackDataExecutable: ParsableCommand {
+struct PackDataExecutable {
 
-    @Option(help: "Input containing the data files")
-    var input: String
+    private enum PackDataError: Error {
+        case runtimeError(String)
+    }
 
-    @Option(help: "Directory containing the output files")
-    var output: String
+    /// Input containing the data files
+    private var input: String
 
-    @Option(help: "list of languages that should copied")
-    var languages: String
+    /// Directory containing the output files
+    private var output: String
 
-    @Option(help: "list of voices that should copied")
-    var voices: String
+    /// list of languages that should copied")
+    private var languages: String
+
+    /// List of voices that should copied
+    private var voices: String
+
+    static func main() throws {
+        let arguments = CommandLine.arguments
+        var input: String?
+        var output: String?
+        var languages: String?
+        var voices: String?
+
+        for (index, argument) in arguments.enumerated() {
+            switch argument {
+            case "--input":
+                input = arguments[index + 1]
+            case "--output":
+                output = arguments[index + 1]
+            case "--languages":
+                languages = arguments[index + 1]
+            case "--voices":
+                voices = arguments[index + 1]
+            default:
+                break
+            }
+        }
+
+        guard let input,
+              let output,
+              let languages,
+              let voices else {
+            throw PackDataError.runtimeError("Not enough arguments!")
+        }
+
+        let executable = PackDataExecutable(input: input,
+                                            output: output,
+                                            languages: languages,
+                                            voices: voices)
+
+        try executable.run()
+    }
 
     func run() throws {
         do {

@@ -85,7 +85,6 @@ let package = Package(
                  targets: ["RHVoiceSwift"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.1")
     ],
     targets: [
         .target(
@@ -182,7 +181,6 @@ let package = Package(
         .executableTarget(
             name: "RHVoiceSwiftSample",
             dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .target(name: "RHVoiceSwift")
             ],
             path: "Sources/RHVoiceSwiftSample",
@@ -199,7 +197,6 @@ let package = Package(
         .executableTarget(
             name: "PackDataExecutable",
             dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             path: "Sources/Plugins/PackDataExecutable"
         ),
