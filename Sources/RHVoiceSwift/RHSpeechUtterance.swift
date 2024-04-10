@@ -15,8 +15,12 @@ public struct RHSpeechUtterance {
         case Max
     }
 
+    enum UtteranceError: Error {
+        case noVoiceProvided
+    }
+
     public let ssml: String?
-    var empty: Bool {
+    var isEmpty: Bool {
         return self.ssml?.isEmpty == true
             || self.ssml == nil
             || self.ssml == "<speak></speak>"
@@ -29,15 +33,20 @@ public struct RHSpeechUtterance {
     public var quality: Quality = .Standart
 
     var synthParams: RHVoice_synth_params {
-        var result = RHVoice_synth_params()
-        result.absolute_pitch = 0.0
-        result.absolute_rate = 0.0
-        result.absolute_volume = 0.0
-        result.relative_rate = rate
-        result.relative_pitch = pitch
-        result.relative_volume = volume
-        result.voice_profile = voice!.identifier.toPointer()
-        return result
+        get throws {
+            var result = RHVoice_synth_params()
+            result.absolute_pitch = 0.0
+            result.absolute_rate = 0.0
+            result.absolute_volume = 0.0
+            result.relative_rate = rate
+            result.relative_pitch = pitch
+            result.relative_volume = volume
+            guard let voice else {
+                throw UtteranceError.noVoiceProvided
+            }
+            result.voice_profile = voice.identifier.toPointer()
+            return result
+        }
     }
 
     public init(ssml: String?) {

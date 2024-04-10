@@ -14,6 +14,13 @@ import AVFoundation
 #endif
 
 public class RHSpeechSynthesizer {
+
+#if canImport(AVFoundation)
+    enum SynthesizerError: Error {
+        case noPlayer
+    }
+#endif
+
     public struct Params {
         // TODO: have logger protocol(RHVoiceLoggerProtocol) and add variable of it's type here
         public var dataPath: String
@@ -46,7 +53,7 @@ public class RHSpeechSynthesizer {
 #if canImport(AVFoundation)
     public func speak(utterance: RHSpeechUtterance) async throws {
         let path = String.temporaryPath(extesnion: "wav")
-        await synthesize(utterance: utterance, to: path)
+        try await synthesize(utterance: utterance, to: path)
         let playerItem = AVPlayerItem(url: URL(fileURLWithPath: path))
         try await playItemAsync(playerItem)
         try FileManager.default.removeItem(atPath: path)
@@ -62,35 +69,39 @@ public class RHSpeechSynthesizer {
     }
 #endif
 
-    public func synthesize(utterance: RHSpeechUtterance, to path: String) async {
+    public func synthesize(utterance: RHSpeechUtterance, to path: String) async throws {
 
         fileStream = PlayerLib.FilePlaybackStream(path)
+        defer {
+            fileStream = nil
+        }
 
         let context = Unmanaged.passRetained(self).toOpaque()
 
-        var params = utterance.synthParams
+        var params = try utterance.synthParams
 
         let paramsAddress = withUnsafePointer(to: &params) { pointer in
             UnsafePointer<RHVoice_synth_params>(pointer)
         }
 
-        if utterance.empty {
+        if utterance.isEmpty {
             return
         }
 
-        let text: String = utterance.ssml ?? ""
+        guard let text: String = utterance.ssml else {
+            return
+        }
         let message = RHVoice_new_message(rhVoiceEngine,
                                           text,
                                           UInt32(text.count),
                                           RHVoice_message_ssml,
                                           paramsAddress,
                                           context)
+        defer {
+            RHVoice_delete_message(message)
+        }
 
         _ = RHVoice_speak(message)
-
-        RHVoice_delete_message(message)
-
-        fileStream = nil
     }
 
     var rhVoiceEngine: RHVoice_tts_engine?
@@ -188,8 +199,9 @@ private extension RHSpeechSynthesizer {
         var statusObserver: NSKeyValueObservation?
         try await withCheckedThrowingContinuation { [weak self] continuation in
 
+            let continuation = continuation as CheckedContinuation<Void, any Error>
             guard let player = self?.player else {
-                continuation.resume() // TODO: throw an error here
+                continuation.resume(throwing: SynthesizerError.noPlayer)
                 return
             }
 
@@ -215,7 +227,6 @@ private extension RHSpeechSynthesizer {
         statusObserver?.invalidate()
         self.playerContinuation = nil
         await stopAndCancel()
-        print("finish")
     }
 #endif
 
