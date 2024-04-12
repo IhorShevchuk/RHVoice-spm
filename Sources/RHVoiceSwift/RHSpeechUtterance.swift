@@ -1,6 +1,6 @@
 //
 //  RHSpeechUtterance.swift
-//  
+//
 //
 //  Created by Ihor Shevchuk on 10.03.2024.
 //
@@ -10,9 +10,9 @@ import RHVoice
 
 public struct RHSpeechUtterance {
     public enum Quality {
-        case Min
-        case Standart
-        case Max
+        case min
+        case standart
+        case max
     }
 
     enum UtteranceError: Error {
@@ -30,7 +30,7 @@ public struct RHSpeechUtterance {
     public var rate: Double = 1.0
     public var volume: Double = 1.0
     public var pitch: Double = 1.0
-    public var quality: Quality = .Standart
+    public var quality: Quality = .standart
 
     var synthParams: RHVoice_synth_params {
         get throws {

@@ -1,6 +1,6 @@
 //
 //  RHVersionInfo.swift
-//  
+//
 //
 //  Created by Ihor Shevchuk on 10.03.2024.
 //

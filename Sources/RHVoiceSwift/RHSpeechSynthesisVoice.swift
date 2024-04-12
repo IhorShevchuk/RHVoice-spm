@@ -11,20 +11,20 @@ import RHVoice
 public struct RHSpeechSynthesisVoice {
 
     public enum Gender {
-        case Female
-        case Male
-        case Unknown
+        case female
+        case male
+        case unknown
 
         init(gender: RHVoice_voice_gender) {
             switch gender {
             case   RHVoice_voice_gender_unknown:
-                self = .Unknown
+                self = .unknown
             case RHVoice_voice_gender_female:
-                self = .Female
+                self = .female
             case  RHVoice_voice_gender_male:
-                self = .Male
+                self = .male
             default:
-                self = .Unknown
+                self = .unknown
             }
         }
     }

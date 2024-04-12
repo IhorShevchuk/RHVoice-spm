@@ -1,6 +1,6 @@
 //
 //  PackDataPluginExecutable.swift
-//  
+//
 //
 //  Created by Ihor Shevchuk on 16.07.2023.
 //  Copyright (C) 2022  Olga Yakovleva <olga@rhvoice.org>

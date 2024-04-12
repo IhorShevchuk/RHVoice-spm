@@ -1,6 +1,6 @@
 //
 //  RHSpeechSynthesizer.swift
-//  
+//
 //
 //  Created by Ihor Shevchuk on 09.03.2024.
 //

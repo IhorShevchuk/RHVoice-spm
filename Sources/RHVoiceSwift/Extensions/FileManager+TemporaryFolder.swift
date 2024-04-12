@@ -1,6 +1,6 @@
 //
 //  FileManager+TemporaryFolder.swift.swift
-//  
+//
 //
 //  Created by Ihor Shevchuk on 27.03.2024.
 //
