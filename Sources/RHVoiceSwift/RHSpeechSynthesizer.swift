@@ -104,7 +104,7 @@ public class RHSpeechSynthesizer {
         _ = RHVoice_speak(message)
     }
 
-    var rhVoiceEngine: RHVoice_tts_engine?
+    private var rhVoiceEngine: RHVoice_tts_engine?
 
     public static var shared: RHSpeechSynthesizer = {
         let instance = RHSpeechSynthesizer(params: .default)
@@ -125,10 +125,10 @@ public class RHSpeechSynthesizer {
 #endif
     }
 
-    var fileStream: PlayerLib.FilePlaybackStream?
+    private var fileStream: PlayerLib.FilePlaybackStream?
 #if canImport(AVFoundation)
-    var player: AVPlayer?
-    var playerContinuation: CheckedContinuation<Void, any Error>?
+    private var player: AVPlayer?
+    private var playerContinuation: CheckedContinuation<Void, any Error>?
 #endif
 }
 

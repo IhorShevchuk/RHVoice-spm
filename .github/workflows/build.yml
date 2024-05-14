@@ -20,6 +20,7 @@ jobs:
         with:
           clean: true
           submodules: recursive
-      - run: |
+      - name: Build
+        run: |
           rm -fr .build | echo "Removed build folder"
-          swift build -c release --target RHVoiceSwift
+          swift build -c release --target RHVoice

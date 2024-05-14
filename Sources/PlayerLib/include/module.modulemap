@@ -1,0 +1,5 @@
+ module PlayerLib {
+    header "FilePlaybackStream.h"
+    
+    requires cplusplus
+}
