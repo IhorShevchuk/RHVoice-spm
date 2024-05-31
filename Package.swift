@@ -78,6 +78,10 @@ let package = Package(
         .library(
             name: "RHVoiceObjC",
             targets: ["RHVoiceObjC"]),
+        .library(
+            name: "RHVoiceObjCDynamic",
+            type: .dynamic,
+            targets: ["RHVoiceObjC"]),
         .plugin(name: "PackDataPlugin", targets: [
             "PackDataPlugin"
         ]),
