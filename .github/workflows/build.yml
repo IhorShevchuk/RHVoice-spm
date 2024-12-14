@@ -23,4 +23,4 @@ jobs:
       - name: Build
         run: |
           rm -fr .build | echo "Removed build folder"
-          swift build -c release --target RHVoice
+          swift build -c release --target RHVoiceSwift
