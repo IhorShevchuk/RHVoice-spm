@@ -44,7 +44,7 @@ public struct RHSpeechUtterance {
             guard let voice else {
                 throw UtteranceError.noVoiceProvided
             }
-            result.voice_profile = voice.identifier.toPointer()
+            result.voice_profile = voice._identifier
             return result
         }
     }

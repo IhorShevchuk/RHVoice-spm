@@ -200,7 +200,6 @@ func versionString(fileName: String) -> String {
 let version = versionString(fileName: "RHVoice/SConstruct")
 package.targets.first?.cSettings?.append(.define("VERSION", to: "\(version)"))
 
-#if SWIFT_SUPPORT
 package.products.append(
     .library(name: "RHVoiceSwift",
              targets: ["RHVoiceSwift"])
@@ -249,4 +248,3 @@ package.targets.append(contentsOf: [
         ]
     )
 ])
-#endif

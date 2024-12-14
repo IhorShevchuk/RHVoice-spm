@@ -32,8 +32,12 @@ struct PackDataExecutable {
             let voices = RHSpeechSynthesisVoice.speechVoices
             var utterance = RHSpeechUtterance(text: "Hello My name is RHVoice!")
             utterance.voice = voices[0]
-
-            try await synthesizer.speak(utterance: utterance)
+            
+            do {
+                try await synthesizer.speak(utterance: utterance)
+            } catch {
+                print("Catched an error: \(error)")
+            }
         }
 
         RunLoop.main.run()

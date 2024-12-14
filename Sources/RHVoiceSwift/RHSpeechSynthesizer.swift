@@ -15,11 +15,14 @@ import AVFoundation
 
 public class RHSpeechSynthesizer {
 
-#if canImport(AVFoundation)
+
     enum SynthesizerError: Error {
+#if canImport(AVFoundation)
         case noPlayer
-    }
 #endif
+        case failToSynthesize
+    }
+
 
     public struct Params {
         // TODO: have logger protocol(RHVoiceLoggerProtocol) and add variable of it's type here
@@ -101,7 +104,10 @@ public class RHSpeechSynthesizer {
             RHVoice_delete_message(message)
         }
 
-        _ = RHVoice_speak(message)
+        let res = RHVoice_speak(message)
+        if res == 0 {
+            throw SynthesizerError.failToSynthesize
+        }
     }
 
     private var rhVoiceEngine: RHVoice_tts_engine?
