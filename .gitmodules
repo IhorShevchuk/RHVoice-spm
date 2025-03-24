@@ -1,3 +1,4 @@
 [submodule "RHVoice"]
 	path = RHVoice/RHVoice
 	url = https://github.com/RHVoice/RHVoice.git
+	branch = master
