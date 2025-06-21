@@ -38,8 +38,8 @@ public class RHSpeechSynthesizer {
 
         }()
 
-        var rhVoiceParam: RHVoiceCpp.engine_wrapper.params {
-            var result = RHVoiceCpp.engine_wrapper.params()
+        var rhVoiceParam: RHVoiceCpp.engine.params {
+            var result = RHVoiceCpp.engine.params()
             result.data_path = std.string(dataPath)
             result.config_path = std.string(configPath)
             return result
@@ -96,7 +96,7 @@ public class RHSpeechSynthesizer {
         document?.synthesize(std.string(path))
     }
 
-    private var rhVoiceEngine: RHVoiceCpp.engine_wrapper?
+    private var rhVoiceEngine: RHVoiceCpp.engine?
 
     public static var shared: RHSpeechSynthesizer = {
         let instance = RHSpeechSynthesizer(params: .default)
@@ -127,7 +127,7 @@ private extension RHSpeechSynthesizer {
     func createEngine() {
         deleteEngine()
         let params = params.rhVoiceParam
-        rhVoiceEngine = RHVoiceCpp.engine_wrapper(params)
+        rhVoiceEngine = RHVoiceCpp.engine(params)
     }
 
     func deleteEngine() {

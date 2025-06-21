@@ -5,14 +5,13 @@
 //  Created by Ihor Shevchuk on 6/20/25.
 //
 
-#include "engine_wrapper.h"
+#include "engine.h"
 
 #include "core/document.hpp"
 
-using namespace RHVoice;
 namespace RHVoiceCpp {
-   engine_wrapper::params::params() {
-       engine::init_params params;
+   engine::params::params() {
+       RHVoice::engine::init_params params;
        data_path = params.data_path;
        config_path = params.config_path;
        pkg_path = params.pkg_path;
@@ -20,8 +19,8 @@ namespace RHVoiceCpp {
        logger = params.logger;
    }
 
-   RHVoice::engine::init_params engine_wrapper::params::get_init_params() const {
-       engine::init_params params;
+   RHVoice::engine::init_params engine::params::get_init_params() const {
+       RHVoice::engine::init_params params;
        params.data_path = data_path;
        params.config_path = config_path;
        params.pkg_path = pkg_path;
@@ -30,27 +29,27 @@ namespace RHVoiceCpp {
        return params;
    }
 
-   engine_wrapper::engine_wrapper(const params& params) {
-       engine = std::make_shared<RHVoice::engine>(params.get_init_params());
+   engine::engine(const params& params) {
+       eng = std::make_shared<RHVoice::engine>(params.get_init_params());
    }
 
-   std::vector<voice_wrapper> engine_wrapper::get_voices() const {
-       std::vector<voice_wrapper> result;
-       const RHVoice::voice_list &voices = engine->get_voices();
+   std::vector<voice> engine::get_voices() const {
+       std::vector<voice> result;
+       const RHVoice::voice_list &voices = eng->get_voices();
        
-       for (auto voice = voices.begin(); voice != voices.end(); ++voice) {
-           result.push_back(voice_wrapper(voice));
+       for (auto voice_element = voices.begin(); voice_element != voices.end(); ++voice_element) {
+           result.push_back(voice(voice_element));
        }
        
        return result;
    }
 
-   document_wrapper engine_wrapper::create_document(const std::string text, voice_wrapper voice) const {
+   document engine::create_document(const std::string text, voice voice) const {
        RHVoice::voice_profile voice_profile(voice.get_voice_info());
-       std::unique_ptr<RHVoice::document> doc = RHVoice::document::create_from_ssml(engine,
+       std::unique_ptr<RHVoice::document> doc = RHVoice::document::create_from_ssml(eng,
                                                                                     text.begin(),
                                                                                     text.end(),
                                                                                     voice_profile);
-       return document_wrapper(std::move(doc));
+       return document(std::move(doc));
    }
 }
