@@ -19,6 +19,8 @@ public struct RHLanguage {
         dataPath = String(language.get_data_path())
         version = RHVersionInfo(format: 0, revision: 0)
     }
+    
+    @MainActor
     public var voices: [RHSpeechSynthesisVoice] {
         return RHSpeechSynthesisVoice.speechVoices.filter { voice in
             voice.language.country == country

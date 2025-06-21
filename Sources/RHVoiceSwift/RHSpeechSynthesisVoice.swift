@@ -38,6 +38,7 @@ public struct RHSpeechSynthesisVoice {
     
     let voiceInfo: RHVoiceCpp.voice
 
+    @MainActor
     static public var speechVoices: [RHSpeechSynthesisVoice] {
         return RHSpeechSynthesizer.shared.speechVoices
     }

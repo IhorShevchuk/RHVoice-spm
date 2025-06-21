@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.1
 
 //  Copyright (C) 2022  Olga Yakovleva <olga@rhvoice.org>
 
@@ -6,36 +6,51 @@ import Foundation
 import PackageDescription
 
 func boostHeadersPaths() -> [String] {
-    let packageURL = URL(fileURLWithPath: #file).deletingLastPathComponent()
-    let RHVoicePath = packageURL
-        .appendingPathComponent("RHVoice")
-        .appendingPathComponent("RHVoice")
-    let boostRoot = RHVoicePath
-        .appendingPathComponent("external")
-        .appendingPathComponent("libs")
-        .appendingPathComponent("boost")
-        .appendingPathComponent("libs")
-    let fileManager = FileManager()
-    guard let folderEnumerator = fileManager.enumerator(at: boostRoot, includingPropertiesForKeys: nil) else {
-        return []
-    }
-    
-    folderEnumerator.skipDescendants()
-    
-    var result: [String] = []
-    for folder in folderEnumerator {
-        guard let folderPath = folder as? URL else {
-            continue
-        }
-        
-        let includePath = folderPath.appendingPathComponent("include").path
-        if fileManager.fileExists(atPath: includePath) {
-            let path = includePath.replacingOccurrences(of: RHVoicePath.path + "/", with: "")
-            result.append(path)
-        }
-    }
-    
-    return result
+    return [
+        "external/libs/boost/libs/nowide/include",
+        "external/libs/boost/libs/move/include",
+        "external/libs/boost/libs/core/include",
+        "external/libs/boost/libs/tuple/include",
+        "external/libs/boost/libs/config/include",
+        "external/libs/boost/libs/array/include",
+        "external/libs/boost/libs/unordered/include",
+        "external/libs/boost/libs/smart_ptr/include",
+        "external/libs/boost/libs/tokenizer/include",
+        "external/libs/boost/libs/interprocess/include",
+        "external/libs/boost/libs/type_traits/include",
+        "external/libs/boost/libs/io/include",
+        "external/libs/boost/libs/container_hash/include",
+        "external/libs/boost/libs/function/include",
+        "external/libs/boost/libs/algorithm/include",
+        "external/libs/boost/libs/numeric_conversion/include",
+        "external/libs/boost/libs/assert/include",
+        "external/libs/boost/libs/date_time/include",
+        "external/libs/boost/libs/optional/include",
+        "external/libs/boost/libs/container/include",
+        "external/libs/boost/libs/system/include",
+        "external/libs/boost/libs/concept_check/include",
+        "external/libs/boost/libs/variant2/include",
+        "external/libs/boost/libs/align/include",
+        "external/libs/boost/libs/iterator/include",
+        "external/libs/boost/libs/detail/include",
+        "external/libs/boost/libs/mp11/include",
+        "external/libs/boost/libs/intrusive/include",
+        "external/libs/boost/libs/json/include",
+        "external/libs/boost/libs/static_assert/include",
+        "external/libs/boost/libs/mpl/include",
+        "external/libs/boost/libs/mpl/preprocessed/include",
+        "external/libs/boost/libs/winapi/include",
+        "external/libs/boost/libs/integer/include",
+        "external/libs/boost/libs/predef/include",
+        "external/libs/boost/libs/range/include",
+        "external/libs/boost/libs/bind/include",
+        "external/libs/boost/libs/exception/include",
+        "external/libs/boost/libs/preprocessor/include",
+        "external/libs/boost/libs/throw_exception/include",
+        "external/libs/boost/libs/type_index/include",
+        "external/libs/boost/libs/lexical_cast/include",
+        "external/libs/boost/libs/utility/include"
+    ]
 }
 
 func boostHeaders(prefix: String = "") -> [CSetting] {
@@ -235,7 +250,7 @@ func versionString(fileName: String) -> String {
     do {
         let packageURL = URL(fileURLWithPath: #file).deletingLastPathComponent()
         let input = packageURL.appendingPathComponent(fileName)
-        let inputString = try String(contentsOf: input)
+        let inputString = try String(contentsOf: input, encoding: .utf8)
         guard let begin = inputString.range(of: "next_version=") else {
             return defaultValue
         }

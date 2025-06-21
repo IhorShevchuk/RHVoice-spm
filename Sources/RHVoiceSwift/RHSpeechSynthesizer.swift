@@ -14,7 +14,7 @@ import CxxStdlib
 import AVFoundation
 #endif
 
-public class RHSpeechSynthesizer {
+public class RHSpeechSynthesizer: @unchecked Sendable  {
     enum SynthesizerError: Error {
 #if canImport(AVFoundation)
         case noPlayer
@@ -31,7 +31,7 @@ public class RHSpeechSynthesizer {
         // TODO: have logger protocol(RHVoiceLoggerProtocol) and add variable of it's type here
         public var dataPath: String
         public var configPath: String
-        public static var `default`: Params = {
+        @MainActor public static let `default`: Params = {
             var pathToData = Bundle.main.path(forResource: "RHVoiceData", ofType: nil)
             if pathToData == nil || pathToData?.isEmpty == true {
                 let rhVoiceBundle = Bundle(path: Bundle.main.path(forResource: "RHVoice_RHVoice", ofType: "bundle") ?? "")
@@ -109,7 +109,8 @@ public class RHSpeechSynthesizer {
 
     private var rhVoiceEngine: RHVoiceCpp.engine?
 
-    public static var shared: RHSpeechSynthesizer = {
+    @MainActor
+    public static let shared: RHSpeechSynthesizer = {
         let instance = RHSpeechSynthesizer(params: .default)
         return instance
     }()
