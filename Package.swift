@@ -15,27 +15,26 @@ func boostHeadersPaths() -> [String] {
         .appendingPathComponent("libs")
         .appendingPathComponent("boost")
         .appendingPathComponent("libs")
-
     let fileManager = FileManager()
     guard let folderEnumerator = fileManager.enumerator(at: boostRoot, includingPropertiesForKeys: nil) else {
         return []
     }
-
+    
     folderEnumerator.skipDescendants()
-
+    
     var result: [String] = []
     for folder in folderEnumerator {
         guard let folderPath = folder as? URL else {
             continue
         }
-
+        
         let includePath = folderPath.appendingPathComponent("include").path
         if fileManager.fileExists(atPath: includePath) {
             let path = includePath.replacingOccurrences(of: RHVoicePath.path + "/", with: "")
             result.append(path)
         }
     }
-
+    
     return result
 }
 
@@ -51,14 +50,14 @@ func commonHeaderSearchPath(prefix: String = "") -> [CSetting] {
         "RHVoice/src/third-party/rapidxml",
         "RHVoice/src/include"
     ]
-
+    
     return headerPaths.map { path in
         return .headerSearchPath(prefix + path)
     }
 }
 
 func commonCSettings(prefix: String = "") -> [CSetting] {
-
+    
     return [                    .define("ANDROID"),
                                 .define("TARGET_OS_IPHONE", .when(platforms: [.iOS])),
                                 .define("TARGET_OS_MAC", .when(platforms: [.macOS]))]
@@ -85,6 +84,8 @@ let package = Package(
         .plugin(name: "PackDataPlugin", targets: [
             "PackDataPlugin"
         ]),
+        .library(name: "RHVoiceSwift",
+                 targets: ["RHVoiceSwift"])
     ],
     dependencies: [
     ],
@@ -170,7 +171,48 @@ let package = Package(
                 sources: [
                     "PackDataPlugin.swift"
                 ]
-               )
+               ),
+        .target(name: "RHVoiceSwift",
+                dependencies: [
+                    .target(name: "RHVoice"),
+                    .target(name: "PlayerLib")
+                ],
+                path: "Sources/RHVoiceSwift",
+                cSettings: ([
+                    .headerSearchPath("../Mock")
+                ]
+                            + commonCSettings(prefix: "../../RHVoice/")
+                ),
+                swiftSettings: [
+                    .interoperabilityMode(.Cxx)
+                ]
+               ),
+        .target(name: "PlayerLib",
+                dependencies: [
+                    .target(name: "RHVoice")
+                ],
+                path: "Sources/PlayerLib",
+                cSettings: ([
+                    .headerSearchPath("../Mock")
+                ]
+                            + commonCSettings(prefix: "../../RHVoice/")
+                )
+               ),
+        .executableTarget(
+            name: "RHVoiceSwiftSample",
+            dependencies: [
+                .target(name: "RHVoiceSwift")
+            ],
+            path: "Sources/RHVoiceSwiftSample",
+            cSettings: ([
+                .headerSearchPath("../Mock")
+            ]
+                        + commonCSettings(prefix: "../../RHVoice/")
+            ),
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ]
+        )
     ],
     cLanguageStandard: .c11,
     cxxLanguageStandard: .cxx11
@@ -185,66 +227,17 @@ func versionString(fileName: String) -> String {
         guard let begin = inputString.range(of: "next_version=") else {
             return defaultValue
         }
-
+        
         guard let end = inputString.range(of: "\n", range: begin.upperBound..<inputString.endIndex) else {
             return defaultValue
         }
-
+        
         return String(inputString[begin.upperBound..<end.lowerBound])
     } catch {
-
+        
     }
     return defaultValue
 }
 
 let version = versionString(fileName: "RHVoice/SConstruct")
 package.targets.first?.cSettings?.append(.define("VERSION", to: "\(version)"))
-
-package.products.append(
-    .library(name: "RHVoiceSwift",
-             targets: ["RHVoiceSwift"])
-)
-
-package.targets.append(contentsOf: [
-    .target(name: "RHVoiceSwift",
-            dependencies: [
-                .target(name: "RHVoice"),
-                .target(name: "PlayerLib")
-            ],
-            path: "Sources/RHVoiceSwift",
-            cSettings: ([
-                .headerSearchPath("../Mock")
-            ]
-                        + commonCSettings(prefix: "../../RHVoice/")
-            ),
-            swiftSettings: [
-                .interoperabilityMode(.Cxx)
-            ]
-           ),
-    .target(name: "PlayerLib",
-            dependencies: [
-                .target(name: "RHVoice")
-            ],
-            path: "Sources/PlayerLib",
-            cSettings: ([
-                .headerSearchPath("../Mock")
-            ]
-                        + commonCSettings(prefix: "../../RHVoice/")
-            )
-           ),
-    .executableTarget(
-        name: "RHVoiceSwiftSample",
-        dependencies: [
-            .target(name: "RHVoiceSwift")
-        ],
-        path: "Sources/RHVoiceSwiftSample",
-        cSettings: ([
-            .headerSearchPath("../Mock")
-        ]
-                    + commonCSettings(prefix: "../../RHVoice/")
-        ),
-        swiftSettings: [
-            .interoperabilityMode(.Cxx)
-        ]
-    )
-])
