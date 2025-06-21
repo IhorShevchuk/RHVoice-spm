@@ -7,15 +7,14 @@
 
 import Foundation
 import RHVoice.RHVoice
-import PlayerLib
+import RHVoiceCpp
+import CxxStdlib
 
 #if canImport(AVFoundation)
 import AVFoundation
 #endif
 
 public class RHSpeechSynthesizer {
-
-
     enum SynthesizerError: Error {
 #if canImport(AVFoundation)
         case noPlayer
@@ -39,10 +38,10 @@ public class RHSpeechSynthesizer {
 
         }()
 
-        var rhVoiceParam: RHVoice_init_params {
-            var result = RHVoice_init_params()
-            result.data_path = dataPath.toPointer()
-            result.config_path = configPath.toPointer()
+        var rhVoiceParam: RHVoiceCpp.engine_wrapper.params {
+            var result = RHVoiceCpp.engine_wrapper.params()
+            result.data_path = std.string(dataPath)
+            result.config_path = std.string(configPath)
             return result
         }
     }
@@ -74,19 +73,6 @@ public class RHSpeechSynthesizer {
 
     public func synthesize(utterance: RHSpeechUtterance, to path: String) async throws {
 
-        fileStream = PlayerLib.FilePlaybackStream(path)
-        defer {
-            fileStream = nil
-        }
-
-        let context = Unmanaged.passRetained(self).toOpaque()
-
-        var params = try utterance.synthParams
-
-        let paramsAddress = withUnsafePointer(to: &params) { pointer in
-            UnsafePointer<RHVoice_synth_params>(pointer)
-        }
-
         if utterance.isEmpty {
             return
         }
@@ -94,23 +80,23 @@ public class RHSpeechSynthesizer {
         guard let text: String = utterance.ssml else {
             return
         }
-        let message = RHVoice_new_message(rhVoiceEngine,
-                                          text,
-                                          UInt32(text.count),
-                                          RHVoice_message_ssml,
-                                          paramsAddress,
-                                          context)
-        defer {
-            RHVoice_delete_message(message)
+        
+        guard let voiceIdentifier = utterance.voice?.identifier else {
+            return
         }
-
-        let res = RHVoice_speak(message)
-        if res == 0 {
-            throw SynthesizerError.failToSynthesize
+        
+        guard let voice = speechVoices.first(where: { $0.identifier == voiceIdentifier }) else {
+            return
         }
+        
+        let document = rhVoiceEngine?.create_document(std.string(text), voice.voiceInfo)
+        document?.set_rate(utterance.rate)
+        document?.set_pitch(utterance.pitch)
+        document?.set_volume(utterance.volume)
+        document?.synthesize(std.string(path))
     }
 
-    private var rhVoiceEngine: RHVoice_tts_engine?
+    private var rhVoiceEngine: RHVoiceCpp.engine_wrapper?
 
     public static var shared: RHSpeechSynthesizer = {
         let instance = RHSpeechSynthesizer(params: .default)
@@ -131,7 +117,6 @@ public class RHSpeechSynthesizer {
 #endif
     }
 
-    private var fileStream: PlayerLib.FilePlaybackStream?
 #if canImport(AVFoundation)
     private var player: AVPlayer?
     private var playerContinuation: CheckedContinuation<Void, any Error>?
@@ -141,60 +126,16 @@ public class RHSpeechSynthesizer {
 private extension RHSpeechSynthesizer {
     func createEngine() {
         deleteEngine()
-        var params = params.rhVoiceParam
-        params.callbacks.play_speech = { samples, count, context in
-            guard let context else {
-                return 0
-            }
-
-            let object = Unmanaged<RHSpeechSynthesizer>.fromOpaque(context).takeUnretainedValue()
-            return object.received(samples: samples, count: count)
-        }
-
-        params.callbacks.set_sample_rate = { sampleRate, context in
-            guard let context else {
-                return 0
-            }
-
-            let object = Unmanaged<RHSpeechSynthesizer>.fromOpaque(context).takeUnretainedValue()
-            return object.changed(sampleRate: sampleRate)
-        }
-
-        params.callbacks.done = { context in
-            guard let context else {
-                return
-            }
-
-            let object = Unmanaged<RHSpeechSynthesizer>.fromOpaque(context).takeUnretainedValue()
-            return object.finished()
-        }
-
-        let address = withUnsafeMutablePointer(to: &params) { pointer in
-            UnsafeMutablePointer<RHVoice_init_params>(pointer)
-        }
-
-        rhVoiceEngine = RHVoice_new_tts_engine(address)
+        let params = params.rhVoiceParam
+        rhVoiceEngine = RHVoiceCpp.engine_wrapper(params)
     }
 
     func deleteEngine() {
-        if let rhVoiceEngine {
-            RHVoice_delete_tts_engine(rhVoiceEngine)
-        }
+        rhVoiceEngine = nil
     }
 }
 
 private extension RHSpeechSynthesizer {
-    func changed(sampleRate: Int32) -> Int32 {
-        return fileStream?.set_sample_rate(sampleRate) == true ? 1 : 0
-    }
-
-    func finished() {
-        fileStream?.finish()
-    }
-
-    func received(samples: UnsafePointer<Int16>?, count: UInt32) -> Int32 {
-        return fileStream?.play_speech(samples, Int(count))  == true ? 1 : 0
-    }
 
 #if canImport(AVFoundation)
     @MainActor
@@ -244,22 +185,12 @@ extension RHSpeechSynthesizer {
         guard let rhVoiceEngine else {
             return []
         }
-
-        let voicesCount = RHVoice_get_number_of_voices(rhVoiceEngine)
-        if voicesCount == 0 {
-            return []
-        }
-
-        guard let voices = RHVoice_get_voices(rhVoiceEngine) else {
-            return []
-        }
-
-        let voicesSequence = UnsafePointerSequence(start: voices, count: Int(voicesCount))
+        let voices = rhVoiceEngine.get_voices()
 
         var result: [RHSpeechSynthesisVoice] = []
 
-        for voice in voicesSequence {
-            result.append(RHSpeechSynthesisVoice(voice: voice.pointee))
+        for voice in voices {
+            result.append(RHSpeechSynthesisVoice(voice: voice))
         }
 
         return result

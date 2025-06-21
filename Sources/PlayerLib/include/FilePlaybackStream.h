@@ -19,9 +19,11 @@
 
 #include <memory>
 
+#include "core/client.hpp"
+
 namespace PlayerLib
 {
-    class FilePlaybackStream
+    class FilePlaybackStream: public RHVoice::client
     {
     public:
         FilePlaybackStream(const char *path);

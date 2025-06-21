@@ -1,13 +1,12 @@
 //
-//  VoiceWrapper.h
+//  voice_wrapper.h
 //  RHVoice
 //
 //  Created by Ihor Shevchuk on 6/20/25.
 //
+#pragma once
 
 #include <string>
-#include <vector>
-#include <memory>
 
 #include "language_wrapper.h"
 
@@ -16,15 +15,15 @@
 namespace RHVoiceCpp {
     class voice_wrapper {
     public:
-        const std::string &get_data_path() const {
+        std::string get_data_path() const {
           return voice_info->get_data_path();
         }
         
-        const std::string &get_name() const {
+        std::string get_name() const {
           return voice_info->get_name();
         }
         
-        const std::string &get_id() const {
+        std::string get_id() const {
           return voice_info->get_id();
         }
         
@@ -34,6 +33,10 @@ namespace RHVoiceCpp {
         
         language_wrapper get_language() const {
             return language_wrapper(voice_info->get_language());
+        }
+        
+        RHVoice::voice_list::const_iterator get_voice_info() const {
+            return voice_info;
         }
         
         explicit voice_wrapper(RHVoice::voice_list::const_iterator voice) {

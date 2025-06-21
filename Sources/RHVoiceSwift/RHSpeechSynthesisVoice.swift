@@ -7,6 +7,7 @@
 
 import Foundation
 import RHVoice
+import RHVoiceCpp
 
 public struct RHSpeechSynthesisVoice {
 
@@ -29,35 +30,23 @@ public struct RHSpeechSynthesisVoice {
         }
     }
 
-    public var name: String {
-        String(char: _name)
-    }
     public let language: RHLanguage
-    public var identifier: String {
-        String(char: _identifier)
-    }
     public let gender: Gender
 
-    let _name: UnsafePointer<CChar>?
-    let _identifier: UnsafePointer<CChar>?
+    public let name: String
+    public let identifier: String
+    
+    let voiceInfo: RHVoiceCpp.voice_wrapper
 
     static public var speechVoices: [RHSpeechSynthesisVoice] {
         return RHSpeechSynthesizer.shared.speechVoices
     }
 
-    init(name: UnsafePointer<CChar>?, language: RHLanguage, identifier: UnsafePointer<CChar>?, gender: Gender) {
-        self._name = name
-        self.language = language
-        self._identifier = identifier
-        self.gender = gender
-    }
-
-    init(voice: RHVoice_voice_info) {
-        self.init(name: voice.name,
-                  language: RHLanguage(code: String(char: voice.language),
-                                       country: String(char: voice.country),
-                                       version: RHVersionInfo(format: 0, revision: 0)),
-                  identifier: voice.name,
-                  gender: Gender(gender: voice.gender))
+    init(voice: RHVoiceCpp.voice_wrapper) {
+        self.name = String(voice.get_name())
+        self.language = RHLanguage(language: voice.get_language())
+        self.identifier = String(voice.get_id())
+        self.gender = Gender(gender: voice.get_gender())
+        self.voiceInfo = voice
     }
 }

@@ -175,7 +175,6 @@ let package = Package(
         .target(name: "RHVoiceSwift",
                 dependencies: [
                     .target(name: "RHVoice"),
-                    .target(name: "PlayerLib"),
                     .target(name: "RHVoiceCpp")
                 ],
                 path: "Sources/RHVoiceSwift",
@@ -216,7 +215,8 @@ let package = Package(
         ),
         .target(name: "RHVoiceCpp",
                 dependencies: [
-                    .target(name: "RHVoice")
+                    .target(name: "RHVoice"),
+                    .target(name: "PlayerLib"),
                 ],
                 path: "Sources/RHVoiceCpp",
                 cSettings: ([
