@@ -11,7 +11,7 @@
 #include "core/language.hpp"
 
 namespace RHVoiceCpp {
-    class language_wrapper {
+    class language {
     public:
         std::string get_name() const {
           return language_info->get_name();
@@ -25,7 +25,7 @@ namespace RHVoiceCpp {
           return language_info->get_data_path();
         }
         
-        explicit language_wrapper(RHVoice::language_list::const_iterator language) {
+        explicit language(RHVoice::language_list::const_iterator language) {
             language_info = language;
         }
         

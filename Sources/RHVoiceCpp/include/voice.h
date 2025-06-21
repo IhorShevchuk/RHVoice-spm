@@ -8,12 +8,12 @@
 
 #include <string>
 
-#include "language_wrapper.h"
+#include "language.h"
 
 #include "core/voice.hpp"
 
 namespace RHVoiceCpp {
-    class voice_wrapper {
+    class voice {
     public:
         std::string get_data_path() const {
           return voice_info->get_data_path();
@@ -31,15 +31,15 @@ namespace RHVoiceCpp {
           return voice_info->get_gender();
         }
         
-        language_wrapper get_language() const {
-            return language_wrapper(voice_info->get_language());
+        language get_language() const {
+            return language(voice_info->get_language());
         }
         
         RHVoice::voice_list::const_iterator get_voice_info() const {
             return voice_info;
         }
         
-        explicit voice_wrapper(RHVoice::voice_list::const_iterator voice) {
+        explicit voice(RHVoice::voice_list::const_iterator voice) {
             voice_info = voice;
         }
         
