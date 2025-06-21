@@ -13,7 +13,7 @@ public struct RHLanguage {
     internal(set) public var country: String
     internal(set) public var version: RHVersionInfo
     private var dataPath: String
-    init(language: RHVoiceCpp.language_wrapper) {
+    init(language: RHVoiceCpp.language) {
         code = String(language.get_alpha2_code())
         country = String(language.get_name())
         dataPath = String(language.get_data_path())

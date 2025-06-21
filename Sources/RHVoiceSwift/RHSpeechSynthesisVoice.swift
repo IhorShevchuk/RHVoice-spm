@@ -36,13 +36,13 @@ public struct RHSpeechSynthesisVoice {
     public let name: String
     public let identifier: String
     
-    let voiceInfo: RHVoiceCpp.voice_wrapper
+    let voiceInfo: RHVoiceCpp.voice
 
     static public var speechVoices: [RHSpeechSynthesisVoice] {
         return RHSpeechSynthesizer.shared.speechVoices
     }
 
-    init(voice: RHVoiceCpp.voice_wrapper) {
+    init(voice: RHVoiceCpp.voice) {
         self.name = String(voice.get_name())
         self.language = RHLanguage(language: voice.get_language())
         self.identifier = String(voice.get_id())

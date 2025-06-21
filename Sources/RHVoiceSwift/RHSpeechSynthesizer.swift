@@ -20,6 +20,10 @@ public class RHSpeechSynthesizer {
         case noPlayer
 #endif
         case failToSynthesize
+        case nothingToSynthesize
+        case noVoiceProvided
+        case cantFindVoice
+        case noEngine
     }
 
 
@@ -38,8 +42,8 @@ public class RHSpeechSynthesizer {
 
         }()
 
-        var rhVoiceParam: RHVoiceCpp.engine_wrapper.params {
-            var result = RHVoiceCpp.engine_wrapper.params()
+        var rhVoiceParam: RHVoiceCpp.engine.params {
+            var result = RHVoiceCpp.engine.params()
             result.data_path = std.string(dataPath)
             result.config_path = std.string(configPath)
             return result
@@ -74,7 +78,7 @@ public class RHSpeechSynthesizer {
     public func synthesize(utterance: RHSpeechUtterance, to path: String) async throws {
 
         if utterance.isEmpty {
-            return
+            throw SynthesizerError.nothingToSynthesize
         }
 
         guard let text: String = utterance.ssml else {
@@ -82,21 +86,28 @@ public class RHSpeechSynthesizer {
         }
         
         guard let voiceIdentifier = utterance.voice?.identifier else {
-            return
+            throw SynthesizerError.noVoiceProvided
         }
         
         guard let voice = speechVoices.first(where: { $0.identifier == voiceIdentifier }) else {
-            return
+            throw SynthesizerError.cantFindVoice
         }
         
-        let document = rhVoiceEngine?.create_document(std.string(text), voice.voiceInfo)
-        document?.set_rate(utterance.rate)
-        document?.set_pitch(utterance.pitch)
-        document?.set_volume(utterance.volume)
-        document?.synthesize(std.string(path))
+        guard let engine = rhVoiceEngine else {
+            throw SynthesizerError.noEngine
+        }
+        
+        let params = RHVoiceCpp.engine.synt_param(rate: utterance.rate,
+                                                  pitch: utterance.pitch,
+                                                  volume: utterance.volume,
+                                                  quality: std.string(utterance.quality.rawValue))
+        engine.synthesize(std.string(text),
+                          std.string(path),
+                          voice.voiceInfo,
+                          params)
     }
 
-    private var rhVoiceEngine: RHVoiceCpp.engine_wrapper?
+    private var rhVoiceEngine: RHVoiceCpp.engine?
 
     public static var shared: RHSpeechSynthesizer = {
         let instance = RHSpeechSynthesizer(params: .default)
@@ -127,7 +138,7 @@ private extension RHSpeechSynthesizer {
     func createEngine() {
         deleteEngine()
         let params = params.rhVoiceParam
-        rhVoiceEngine = RHVoiceCpp.engine_wrapper(params)
+        rhVoiceEngine = RHVoiceCpp.engine(params)
     }
 
     func deleteEngine() {

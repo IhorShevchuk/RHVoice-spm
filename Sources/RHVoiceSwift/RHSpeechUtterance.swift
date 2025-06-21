@@ -9,10 +9,10 @@ import Foundation
 import RHVoice
 
 public struct RHSpeechUtterance {
-    public enum Quality {
-        case min
+    public enum Quality: String {
+        case minimum
         case standart
-        case max
+        case maximum
     }
 
     enum UtteranceError: Error {

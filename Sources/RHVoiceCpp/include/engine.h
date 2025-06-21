@@ -10,14 +10,14 @@
 #include <vector>
 #include <memory>
 
-#include "voice_wrapper.h"
-#include "document_wrapper.h"
+#include "voice.h"
 
 #include "core/event_logger.hpp"
 #include "core/engine.hpp"
+#include "core/document.hpp"
 
 namespace RHVoiceCpp {
-   class engine_wrapper {
+   class engine {
    public:
        
    public:
@@ -30,11 +30,19 @@ namespace RHVoiceCpp {
            
            RHVoice::engine::init_params get_init_params() const;
        };
-       explicit engine_wrapper(const params& param=params());
-       std::vector<voice_wrapper> get_voices() const;
-       document_wrapper create_document(const std::string text, voice_wrapper voice) const;
        
+       struct synt_param {
+           double rate, pitch, volume;
+           std::string quality;
+       };
+       
+       explicit engine(const params& param=params());
+       std::vector<voice> get_voices() const;
+       void synthesize(const std::string text,
+                       const std::string path,
+                       voice voice,
+                       synt_param param) const;      
    private:
-       std::shared_ptr<RHVoice::engine> engine;
+       std::shared_ptr<RHVoice::engine> eng;
    };
 }
