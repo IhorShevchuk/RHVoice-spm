@@ -175,7 +175,8 @@ let package = Package(
         .target(name: "RHVoiceSwift",
                 dependencies: [
                     .target(name: "RHVoice"),
-                    .target(name: "PlayerLib")
+                    .target(name: "PlayerLib"),
+                    .target(name: "RHVoiceCpp")
                 ],
                 path: "Sources/RHVoiceSwift",
                 cSettings: ([
@@ -212,7 +213,18 @@ let package = Package(
             swiftSettings: [
                 .interoperabilityMode(.Cxx)
             ]
-        )
+        ),
+        .target(name: "RHVoiceCpp",
+                dependencies: [
+                    .target(name: "RHVoice")
+                ],
+                path: "Sources/RHVoiceCpp",
+                cSettings: ([
+                    .headerSearchPath("../Mock")
+                ]
+                            + commonCSettings(prefix: "../../RHVoice/")
+                )
+         )
     ],
     cLanguageStandard: .c11,
     cxxLanguageStandard: .cxx11
