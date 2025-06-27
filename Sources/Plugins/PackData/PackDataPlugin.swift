@@ -18,6 +18,8 @@ struct PackDataPlugin: BuildToolPlugin {
 
     let config = "RHVoice.json"
 
+    @available(swift, obsoleted: 6.0,
+               message: "packageRoot provides wrong path in Swift 6.")
     var packageRoot: String {
         let packageURL = URL(fileURLWithPath: #file)
             .deletingLastPathComponent()

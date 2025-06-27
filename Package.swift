@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 5.9
 
 //  Copyright (C) 2022  Olga Yakovleva <olga@rhvoice.org>
 
