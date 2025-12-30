@@ -9,7 +9,6 @@ import CxxStdlib
 import Foundation
 import RHVoice
 import RHVoiceCpp
-import os.log
 
 public enum RHVoiceLogLevel: Int32, Sendable {
     case trace

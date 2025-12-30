@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import os.log
 
 final class RHVoiceLoggerImpl: RHVoiceLogger {
     func log(
