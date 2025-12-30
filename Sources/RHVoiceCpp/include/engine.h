@@ -18,7 +18,6 @@
 
 namespace RHVoiceCpp {
    class engine {
-   public:
        
    public:
        struct params
