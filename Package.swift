@@ -80,6 +80,8 @@ func commonCSettings(prefix: String = "") -> [CSetting] {
     + commonHeaderSearchPath(prefix: prefix)
 }
 
+let version = versionString(fileName: "RHVoice/SConstruct")
+
 let package = Package(
     name: "RHVoice",
     platforms: [
@@ -147,7 +149,8 @@ let package = Package(
                 .define("RHVOICE"),
                 .define("PACKAGE", to: "\"RHVoice\""),
                 .define("DATA_PATH", to: "\"\""),
-                .define("CONFIG_PATH", to: "\"\"")
+                .define("CONFIG_PATH", to: "\"\""),
+                .define("VERSION", to: "\(version)")
             ]
             + commonCSettings()
         ),
@@ -265,6 +268,3 @@ func versionString(fileName: String) -> String {
     }
     return defaultValue
 }
-
-let version = versionString(fileName: "RHVoice/SConstruct")
-package.targets.first?.cSettings?.append(.define("VERSION", to: "\(version)"))
