@@ -8,13 +8,13 @@ on:
       - 'main'
 
 jobs:
-  linux:
+  build:
     strategy:
       fail-fast: false
       matrix:
         image: 
           - "swift:6.1.0"
-    name: Linux
+    name: Build
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}
@@ -25,5 +25,6 @@ jobs:
           submodules: recursive
       - name: Build
         run: |
-          rm -fr .build | echo "Removed build folder"
+          rm -fr .build
+          echo "Removed build folder"
           swift build -c release --target RHVoiceSwift
