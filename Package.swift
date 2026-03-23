@@ -80,7 +80,7 @@ func commonCSettings(prefix: String = "") -> [CSetting] {
     + commonHeaderSearchPath(prefix: prefix)
 }
 
-let version = versionString(fileName: "RHVoice/SConstruct")
+let version = versionString(fileName: "RHVoice/src/wininst/SConscript")
 
 let package = Package(
     name: "RHVoice",

@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "type": "lldb",
+            "type": "swift",
             "request": "launch",
             "sourceLanguages": [
                 "swift"
@@ -9,11 +9,12 @@
             "args": [],
             "cwd": "${workspaceFolder:RHVoice-spm}",
             "name": "Debug PackDataExecutable",
-            "program": "${workspaceFolder:RHVoice-spm}/.build/debug/PackDataExecutable",
-            "preLaunchTask": "swift: Build Debug PackDataExecutable"
+            "preLaunchTask": "swift: Build Debug PackDataExecutable",
+            "target": "PackDataExecutable",
+            "configuration": "debug"
         },
         {
-            "type": "lldb",
+            "type": "swift",
             "request": "launch",
             "sourceLanguages": [
                 "swift"
@@ -21,11 +22,12 @@
             "args": [],
             "cwd": "${workspaceFolder:RHVoice-spm}",
             "name": "Release PackDataExecutable",
-            "program": "${workspaceFolder:RHVoice-spm}/.build/release/PackDataExecutable",
-            "preLaunchTask": "swift: Build Release PackDataExecutable"
+            "preLaunchTask": "swift: Build Release PackDataExecutable",
+            "target": "PackDataExecutable",
+            "configuration": "release"
         },
         {
-            "type": "lldb",
+            "type": "swift",
             "request": "launch",
             "sourceLanguages": [
                 "swift"
@@ -33,11 +35,12 @@
             "args": [],
             "cwd": "${workspaceFolder:RHVoice-spm}",
             "name": "Debug RHVoiceSwiftSample",
-            "program": "${workspaceFolder:RHVoice-spm}/.build/debug/RHVoiceSwiftSample",
-            "preLaunchTask": "swift: Build Debug RHVoiceSwiftSample"
+            "preLaunchTask": "swift: Build Debug RHVoiceSwiftSample",
+            "target": "RHVoiceSwiftSample",
+            "configuration": "debug"
         },
         {
-            "type": "lldb",
+            "type": "swift",
             "request": "launch",
             "sourceLanguages": [
                 "swift"
@@ -45,8 +48,9 @@
             "args": [],
             "cwd": "${workspaceFolder:RHVoice-spm}",
             "name": "Release RHVoiceSwiftSample",
-            "program": "${workspaceFolder:RHVoice-spm}/.build/release/RHVoiceSwiftSample",
-            "preLaunchTask": "swift: Build Release RHVoiceSwiftSample"
+            "preLaunchTask": "swift: Build Release RHVoiceSwiftSample",
+            "target": "RHVoiceSwiftSample",
+            "configuration": "release"
         }
     ]
 }
